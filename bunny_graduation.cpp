@@ -68,32 +68,92 @@ Modify the program so that new babies are born in an empty random adjacent squar
 
 const std::string nameList [] = {"Mario", "Luigi", "Donkey Kong", "Captain Falcon", "Fox", "Falco", "Pikachu", "Ness", "Kirby", "Jigglypuff", "Ganondorf", "Marth", "Roy", "Zelda", "Link", "Young Link", "Sheik", "Yoshi", "Doctor Mario", "Pichu", "Samus", "Mewtwo", "Popo", "Nana", "Mr. Game & Watch", "Peach", "Bowser"};
 
-enum sex_t {
+enum sex_enum {
   male, female
 };
 
-enum color_t {
+enum color_enum {
   white, brown, black, spotted
 };
 
 class Bunny {
   private:
-  sex_t sex;
-  color_t color;
+  sex_enum sex;
+  color_enum color;
   int age;
   std::string name;
   bool radioactive_mutant_vampire_bunny;
   
   
   public:
-  Bunny () {
-    //nothing to see here parker
+  Bunny (std::mt19937 eng, std::uniform_int_distribution<> distr_sex, std::uniform_int_distribution<> distr_color, std::uniform_int_distribution<> distr_name, std::uniform_int_distribution<> distr_rmvb) {
+    sex = static_cast<sex_enum>(distr_sex(eng));
+    color = static_cast<color_enum>(distr_color(eng));
+    age = 0;
+    name = nameList[distr_name(eng)];
+    int rmvb_random_num = distr_rmvb(eng);
+    if (rmvb_random_num >= 0 && rmvb_random_num < 2) {
+      radioactive_mutant_vampire_bunny = true;
+    }
+    else {
+      radioactive_mutant_vampire_bunny = false;
+    }
+      
+  }
+  ~Bunny () {
+    
+  }
+  
+  void printBunny () {
+    std::string str_sex;
+    std::string str_color;
+    switch (sex) {
+      case male:
+        str_sex = "male";
+        break;
+      case female:
+        str_sex = "female";
+        break;
+      default:
+        str_sex = "enum_switch_had_a_problem";
+    }
+    switch (color) {
+      case white:
+        str_color = "white";
+        break;
+      case brown:
+        str_color = "brown";
+        break;
+      case black:
+        str_color = "black";
+        break;
+      case spotted:
+        str_color = "spotted";
+        break;
+      default:
+        str_color = "enum_switch_had_a_problem";
+    }
+    
+    std::cout << str_sex << " " << str_color << " " << age << " " << name << " " << (radioactive_mutant_vampire_bunny ? "true" : "false") << std::endl;
   }
 };
 
+int gameInit();
+int gameLoop();
+int gameQuit();
+
 int main ()
 {
-  std::mt19937 mt_rand(time(0));
+  std::random_device rd; // obtain a random number from hardware
+  std::mt19937 eng(rd()); // seed the generator
+  std::uniform_int_distribution<> distr_sex(0, 1); // define the range
+  std::uniform_int_distribution<> distr_color(0, 3);
+  std::uniform_int_distribution<> distr_name(0, sizeof(nameList)/sizeof(nameList[0]) - 1);
+  std::uniform_int_distribution<> distr_rmvb(0, 99);
+
+  Bunny lab_bunny(eng, distr_sex, distr_color, distr_name, distr_rmvb);
+  
+  lab_bunny.printBunny();
   
   return 0;
 }
